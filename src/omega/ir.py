@@ -56,7 +56,7 @@ class AtlasTechnique:
     taxonomy corpora get mapped *onto*; it carries no detection logic, so it does not fit ``CompiledRule``
     (no blocks, no polarity, no condition — forcing it into that shape would assert a rule-likeness it
     doesn't have). ``tactics`` is the open id-tuple of ``AML.TAxxxx`` tactics this technique belongs to
-    (empty for most subtechniques, which inherit tactic from their parent rather than restating it).
+    (empty when the source lists none, as for most subtechniques — NOT inherited from the parent; see DECISIONS.md).
     ``parent`` is the base technique id when this is a subtechnique (ATLAS's ``specializes``), else
     ``None``. ``attack_refs`` are the ATT&CK technique ids this node references, in Sigma's tag format
     (``attack.t1596``) so they compare directly against a rule's ``attack`` axis tokens — the bridge."""

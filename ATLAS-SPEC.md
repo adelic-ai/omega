@@ -1,6 +1,6 @@
 # omega — MITRE ATLAS consume + coverage cartography (spec)
 
-**Status:** spec, 2026-08. A self-contained omega enhancement — a new ingest + a new bridge axis,
+**Status:** spec, 2026-08 — since built (PR #1); judgment calls and deviations are recorded in `DECISIONS.md`. A self-contained omega enhancement — a new ingest + a new bridge axis,
 using the existing IR / FCA / SKOS machinery. Not a rewrite.
 
 **Goal:** extend omega to consume **MITRE ATLAS** (the adversarial-threat framework for AI systems —

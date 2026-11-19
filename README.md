@@ -71,8 +71,8 @@ python -m omega bridge --sigma path/to/sigma/rules --car path/to/car
 ```
 omega cross-corpus bridge — axis 'attack' over ['car', 'sigma']
   car      rules=  102  attack-tokens=  122  unique-to-it=10
-  sigma    rules= 3748  attack-tokens=  633  unique-to-it=521
-  pairwise shared: {'car~sigma': 112}   shared-by-all: 112   union: 643
+  sigma    rules= 3783  attack-tokens=  642  unique-to-it=530
+  pairwise shared: {'car~sigma': 112}   shared-by-all: 112   union: 652
   concrete joins (a shared token bridging the corpora):
     tag:attack.t1003    car=[CAR-2013-04-002, ...]  sigma=[3ec9a16d-..., ...]
 ```
@@ -90,25 +90,25 @@ python -m omega atlas --sigma path/to/sigma/rules --car path/to/car --atlas path
 ```
 
 ```
-ingest: sigma 3137 rules, car 102 analytics, atlas 170 techniques (car deferred={'unparsed-implementations': 99})
-atlas coverage — 170 techniques: covered(direct)=0 / covered(bridged)=26 / uncertain(CAR-coarse)=0 / silent(no-bridge)=136 / silent(uncovered)=8
+ingest: sigma 3783 rules, car 102 analytics, atlas 140 techniques (car deferred={'unparsed-implementations': 99})
+atlas coverage — 140 techniques: covered(direct)=0 / covered(bridged)=21 / uncertain(CAR-coarse)=0 / silent(no-bridge)=112 / silent(uncovered)=7
 ```
 
-writing `out/atlas_coverage.json` (the table) and `out/atlas_coverage.ttl` (the SKOS graph). (Run against the
-live SigmaHQ/sigma and mitre-attack/car checkouts and the compiled ATLAS.yaml — reproducible, not asserted;
-your own run's exact counts will drift as those corpora grow.)
+writing `out/atlas_coverage.json` (the table) and `out/atlas_coverage.ttl` (the SKOS graph). (Run against a
+SigmaHQ/sigma checkout (3,783 rules), mitre-attack/car (102 analytics) and the compiled ATLAS.yaml v5.1.0 —
+reproducible, not asserted; your own run's exact counts will drift as those corpora grow.)
 
-**Read the silences, not just the coverage.** 136 of 170 ATLAS techniques (80%) come back silent — that's
+**Read the silences, not just the coverage.** 112 of 140 ATLAS techniques (80%) come back silent — that's
 the finding, not a gap in the build: existing rule libraries barely target AI-threats, and most ATLAS
 techniques have no ATT&CK analog at all (prompt injection, model evasion, training-data poisoning, …), so no
 ATT&CK-speaking corpus could reach them regardless of how complete it is. omega keeps that distinction
 honest with **two different silences**: `silent(no-bridge)` (no ATT&CK reference exists — structural,
-nothing to fill) vs `silent(uncovered)` (a reference exists, nothing reaches it — an actual gap; 8 of them
+nothing to fill) vs `silent(uncovered)` (a reference exists, nothing reaches it — an actual gap; 7 of them
 here). A third status, `uncertain(CAR-coarse)`, marks a technique whose only path to coverage runs through a
 CAR analytic's unparsed query logic — a blind spot in what omega can verify, kept out of both `covered` and
 `silent` rather than guessed either way (0 here — every CAR-reachable technique above is also Sigma-reached,
 in this particular pair of corpora). A run that reports high coverage is suspect for exactly this reason —
-here `covered` is 26 of 170 (15%), well under the CLI's half-the-total warning threshold.
+here `covered` is 21 of 140 (15%), well under the CLI's half-the-total warning threshold.
 
 ## How it works
 
@@ -137,7 +137,11 @@ rulesets → ingest adapters → [ IR ] → axes → FCA concepts → SKOS relat
   different rules can fire on the same events; that equivalence is invisible to structure and needs a runtime,
   which omega does not (yet) do.
 - **Parse-for-clustering ≠ evaluate-for-firing.** Because pySigma parses the full spec, omega represents even
-  rules it could not *execute* (base64, field-references, correlation) — they still yield attributes.
+  rules it could not *execute* (base64, regex, field-references) — they still yield attributes.
+- **Sigma features not modelled.** Correlation rules are counted and skipped, not lowered. A rule with several
+  conditions is read from its first. A block's polarity is kept but the condition's structure is not, so
+  `all of sel_*` and `1 of sel_*` read as the same rule. `related:` links and rule metadata (`status`, `level`)
+  are not read. None of correlation, multi-condition rules or aggregation occurs in the SigmaHQ checkout above.
 - **CAR is coarse (v1).** CAR analytics carry their logic as implementations in *other* query languages
   (SPL/EQL/pseudocode); omega ingests their structured axes (ATT&CK coverage, platforms, data-model
   references) and counts the unparsed query logic rather than dropping it. The ATLAS coverage cartography
@@ -150,4 +154,4 @@ rulesets → ingest adapters → [ IR ] → axes → FCA concepts → SKOS relat
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE). The license covers omega's
-code only, not the external corpora it reads (Sigma, CAR), which carry their own licenses.
+code only, not the external corpora it reads (Sigma, CAR, ATLAS), which carry their own licenses.
