@@ -44,11 +44,11 @@ python -m omega run --corpus path/to/sigma/rules --out ./out
 ```
 
 ```
-ingest: 3748 files, 3748 rules, clean=True
-omega over-collapse — 3748 rules
+ingest: 3783 files, 3783 rules, clean=True
+omega over-collapse — 3783 rules
   projections:  blind=['field']  aware=['clause', 'polarity']
-  corpus:  blind 592 concepts  ->  aware 3737  (split 6.31x)   biggest blind class: 416  aware residue: 11
-  lattice edges by kind: {'related': 14728, 'broader': 78, 'narrower': 53, 'exact': 11, 'close': 17}
+  corpus:  blind 599 concepts  ->  aware 3772  (split 6.3x)   biggest blind class: 424  aware residue: 11
+  lattice edges by kind: {'related': 15806, 'broader': 79, 'narrower': 51, 'exact': 11, 'close': 19}
   ...per-product breakdown...
   generalizes (aware > blind in every slice): True
 ```
@@ -56,8 +56,8 @@ omega over-collapse — 3748 rules
 writing `out/figures.json` (the numbers) and `out/lattice.ttl` (the SKOS graph, SPARQL-able).
 
 **Reading that output — the projection knob at work.** Keying rules on the *fields they read* (value-blind)
-folds these Sigma rules into 592 "concepts," one of them swallowing 416 distinct detections; keying on *field +
-value + polarity* (value-aware) tells 3,737 apart. Same rules, two projections, a ~6× swing in what counts as
+folds these Sigma rules into 599 "concepts," one of them swallowing 424 distinct detections; keying on *field +
+value + polarity* (value-aware) tells 3,772 apart. Same rules, two projections, a ~6× swing in what counts as
 "the same" — the machinery shown on one corpus, not a privileged verdict about it.
 
 ### Cross-corpus bridge
