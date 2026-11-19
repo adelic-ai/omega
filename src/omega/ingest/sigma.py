@@ -15,6 +15,7 @@ from pathlib import Path
 
 from sigma.collection import SigmaCollection
 from sigma.rule import SigmaRule
+from sigma.types import SigmaNull
 
 from omega.ingest.base import ParseReport
 from omega.ir import Atom, Block, CompiledRule, Source
@@ -116,6 +117,18 @@ def _block_polarities(condition: str, names: list[str]) -> dict[str, int]:
     return pol
 
 
+NULL_VALUE = "<null>"
+"""Stable stand-in for a Sigma ``field: null`` test (field absent/empty). A literal string value of exactly
+``<null>`` would collide with it; none exists in the SigmaHQ corpus, and it is not a plausible event value."""
+
+
+def _value_str(v: object) -> str:
+    """Render one pySigma value as the string stored on an ``Atom``. ``SigmaNull`` has no ``__str__``, so
+    ``str()`` yields ``<sigma.types.SigmaNull object at 0x...>`` — a per-object memory address that differs
+    between rules and between runs. Map it to a fixed sentinel so identical null tests compare equal."""
+    return NULL_VALUE if isinstance(v, SigmaNull) else str(v)
+
+
 def _atoms(detection) -> list[Atom]:
     """Flatten a (possibly nested) ``SigmaDetection`` into its atoms. A block written as a *list of maps* is a
     nested ``SigmaDetection`` per map, so ``detection_items`` can hold sub-detections as well as field tests.
@@ -129,7 +142,7 @@ def _atoms(detection) -> list[Atom]:
             out.append(Atom(
                 field=item.field,
                 mods=tuple(_modname(m) for m in (item.modifiers or [])),
-                values=tuple(str(v) for v in (item.value or [])),
+                values=tuple(_value_str(v) for v in (item.value or [])),
             ))
     return out
 
