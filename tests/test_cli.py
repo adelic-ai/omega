@@ -1,6 +1,7 @@
 """Stage 6 — the CLI. Pins that `run` wires the pipeline end to end, writes artifacts with --out, chooses the
 projection from the command line, and fails cleanly on a bad corpus path."""
 
+import re
 import json
 import os
 from pathlib import Path
@@ -58,4 +59,5 @@ def test_bad_corpus_path_fails_cleanly(tmp_path, capsys):
 def test_run_over_real_corpus(tmp_path, capsys):
     rc = main(["run", "--corpus", str(SIGMA), "--out", str(tmp_path / "out")])
     assert rc == 0
-    assert "3748 rules" in capsys.readouterr().out
+    m = re.search(r"ingest: \d+ files, (\d+) rules", capsys.readouterr().out)
+    assert m and int(m.group(1)) >= 3700                  # lower bound, not a pinned corpus revision
